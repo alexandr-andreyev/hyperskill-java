@@ -1,5 +1,9 @@
 package encryptdecrypt;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
@@ -18,26 +22,75 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        String command = "enc";
-        String text = "";
+        String mode = "enc";
+        String data = "";
         int key = 0;
+        boolean isInFile = false;
+        boolean isOutFile = false;
+        String pathInFileName = "";
+        String pathOutFileName = "";
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-mode")) {
-                command = args[i + 1];
-            } else if (args[i].equals("-key")) {
-                key = Integer.parseInt(args[i + 1]);
-            } else if (args[i].equals("-data")) {
-                text = args[i + 1];
+            switch (args[i]) {
+                case "-mode":
+                    mode = args[i + 1];
+                    break;
+                case "-key":
+                    key = Integer.parseInt(args[i + 1]);
+                    break;
+                case "-data":
+                    data = args[i + 1];
+                    break;
+                case "-in":
+                    isInFile = true;
+                    pathInFileName = args[i + 1];
+                    break;
+                case "-out":
+                    isOutFile = true;
+                    pathOutFileName = args[i + 1];
+                    break;
+                default:
+                    break;
             }
         }
-        char[] charsFromText = text.toCharArray();
-        switch (command) {
+
+        if (isInFile) {
+            File inFile = new File(pathInFileName);
+            try (Scanner scanner = new Scanner(inFile)) {
+                while (scanner.hasNext()) {
+                    data = scanner.nextLine();
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("No file found: " + pathInFileName);
+            }
+        }
+
+        char[] charsFromText = data.toCharArray();
+
+        switch (mode) {
             case "enc" :
-            System.out.println(encode(charsFromText,key));
+                if (isOutFile) {
+                    File outFile = new File(pathOutFileName);
+                    try (FileWriter writer = new FileWriter(outFile)) {
+                        writer.write(encode(charsFromText,key));
+                    } catch (IOException e) {
+                        System.out.printf("An exception occurs %s", e.getMessage());
+                    }
+                } else {
+                    System.out.println(encode(charsFromText,key));
+                }
             break;
             case "dec" :
-            System.out.println(decode(charsFromText,key));
+                if (isOutFile) {
+                    File outFile = new File(pathOutFileName);
+                    try (FileWriter writer = new FileWriter(outFile)) {
+                        writer.write(decode(charsFromText,key));
+                    } catch (IOException e) {
+                        System.out.printf("An exception occurs %s", e.getMessage());
+                    }
+                } else {
+                    System.out.println(decode(charsFromText,key));
+                }
             break;
             default:
                 break;
