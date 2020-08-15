@@ -21,6 +21,19 @@ public class Main {
         return charsFromText;
     }
 
+    public static void outputResultToFile (String pathOutFileName, char[] charsFromText, int key, String mode) {
+        File outFile = new File(pathOutFileName);
+        try (FileWriter writer = new FileWriter(outFile)) {
+            if (mode.equals("enc")) {
+                writer.write(encode(charsFromText,key));
+            } else {
+                writer.write(decode(charsFromText,key));
+            }
+        } catch (IOException e) {
+            System.out.printf("An exception occurs %s", e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         String mode = "enc";
         String data = "";
@@ -67,33 +80,10 @@ public class Main {
 
         char[] charsFromText = data.toCharArray();
 
-        switch (mode) {
-            case "enc" :
-                if (isOutFile) {
-                    File outFile = new File(pathOutFileName);
-                    try (FileWriter writer = new FileWriter(outFile)) {
-                        writer.write(encode(charsFromText,key));
-                    } catch (IOException e) {
-                        System.out.printf("An exception occurs %s", e.getMessage());
-                    }
-                } else {
-                    System.out.println(encode(charsFromText,key));
-                }
-            break;
-            case "dec" :
-                if (isOutFile) {
-                    File outFile = new File(pathOutFileName);
-                    try (FileWriter writer = new FileWriter(outFile)) {
-                        writer.write(decode(charsFromText,key));
-                    } catch (IOException e) {
-                        System.out.printf("An exception occurs %s", e.getMessage());
-                    }
-                } else {
-                    System.out.println(decode(charsFromText,key));
-                }
-            break;
-            default:
-                break;
+        if (isOutFile) {
+            outputResultToFile(pathOutFileName, charsFromText, key, mode);
+        } else {
+            System.out.println(encode(charsFromText,key));
         }
 
     }
